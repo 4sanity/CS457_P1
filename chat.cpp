@@ -1,7 +1,7 @@
 //Sam Bruns
 //Project 1
 //Date: 9/3/2014
-//chat.cpp
+//chat.cpp 
 
 #include <string>
 #include <iostream>
