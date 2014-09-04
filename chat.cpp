@@ -9,22 +9,10 @@
 #include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
-//#include <netinet/in.h>
 #include <arpa/inet.h>
 #define MAXPENDING 5
 
 using namespace std;
-
-// struct In_addr {
-    // unsigned long s_addr;
-// };
-
-// struct socketAddress{
-	// unsigned short family;
-	// unsigned short port;
-	// struct In_addr addr;
-	// char zero[8];
-// };
 
 int main(int argc, char *argv[]){
 	string welcome = "Welcome to Chat!";
@@ -33,8 +21,6 @@ int main(int argc, char *argv[]){
 	struct sockaddr_in serverAddress;
 	struct sockaddr_in clientAddress;
 	int newSocket;
-	//struct socketAddress serverAddress;
-	//struct socketAddress clientAddress;
 	
 	if(argc==1){
 		//server side
@@ -58,18 +44,6 @@ int main(int argc, char *argv[]){
 			exit(1);
 		}
 		
-		//struct hostent *he;
-		//printf("IP address: %s\n", inet_ntoa(*(struct in_addr*)he->serverAddress_addr));
-		
-		// socklen_t serverAddLen;
-		// serverAddLen = sizeof(serverAddress);
-		// if(getsockname(serverSocket,(struct sockaddr*)&serverAddress,&serverAddLen)<0){
-			//error
-		// }else{
-			// printf("Local IP address is: %s\n", inet_ntoa(serverAddress.sin_addr));
-			// printf("Port Number: %d\n", ntohs(serverAddress.sin_port));
-		// }
-		
 		// printf("%d\n",ntohl(serverAddress.sin_addr.s_addr));
 		// char *some_addr;
 		// some_addr = inet_ntoa(serverAddress.sin_addr);
@@ -86,8 +60,8 @@ int main(int argc, char *argv[]){
 		
 		
 	}else if(argc==2){
-		string arg2 = argv[1];
-		if(arg2=="-h"){
+		string arg1 = argv[1];
+		if(arg1=="-h"){
 			//help message
 			cout << "got to help" << endl;
 		}else{
@@ -97,6 +71,43 @@ int main(int argc, char *argv[]){
 		
 	}else if(argc==5){
 		//client side
+		string arg1 = argv[1];
+		string arg2 = argv[2];
+		string arg3 = argv[3];
+		string arg4 = argv[4];
+		int port;
+		string Saddress;
+		
+		if( (arg1=="-p"&&arg3=="-p") || (arg1=="-s"&&arg3=="-s") ){
+			cout << "Error: Arguments incorrect. Use ./chat -h for help message." << endl;
+			exit(1);
+		}
+		if(arg1!="-p" && arg1!="-s" ){
+			cout << "Error: Arguments incorrect. Use ./chat -h for help message." << endl;
+			exit(1);
+		}
+		if(arg3!="-s" && arg3!="-p" ){
+			cout << "Error: Arguments incorrect. Use ./chat -h for help message." << endl;
+			exit(1);
+		}
+		if(arg1=="-p" && !atoi(argv[2])){
+			cout << "Error: Could not convert port argument to number." << endl;
+			exit(1);
+		}		
+		if(arg3=="-p" && !atoi(argv[4])){
+			cout << "Error: Could not convert port argument to number." << endl;
+			exit(1);
+		}
+		if(arg1=="-s" && !atoi(argv[2])){
+			cout << "Error: Could not convert port argument to number." << endl;
+			exit(1);
+		}		
+		if(arg3=="-s" && !atoi(argv[4])){
+			cout << "Error: Could not convert port argument to number." << endl;
+			exit(1);
+		}
+		
+		
 		
 		
 	}else{
