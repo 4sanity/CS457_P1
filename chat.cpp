@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
+//#include <netinet/in.h>
 #include <arpa/inet.h>
 #define MAXPENDING 5
 
@@ -38,29 +39,42 @@ int main(int argc, char *argv[]){
 	if(argc==1){
 		//server side
 		//when change IPPROTO_TCP from 0 fails to bind when i use the same port within a certain time
-		if((serverSocket=socket(PF_INET,SOCK_STREAM,IPPROTO_TCP))<0){
+		if((serverSocket=socket(PF_INET,SOCK_STREAM,0))<0){
 			cout << "Error: Server socket could not be created." << endl;
 			exit(1);
 		}
 		
 		serverAddress.sin_family = AF_INET;
-		serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
-		serverAddress.sin_port = htons(6968);
+		serverAddress.sin_addr.s_addr = htonl(INADDR_ANY); //LOOPBACK binds to localhost
+		serverAddress.sin_port = htons(5894);
 		
 		if(bind(serverSocket,(struct sockaddr*)&serverAddress,sizeof(serverAddress))<0){
 			cout << "Error: Server failed to bind." << endl;
 			exit(1);
 		}
 		
-		char *some_addr;
-		some_addr = inet_ntoa(serverAddress.sin_addr);
-		printf("%s\n", some_addr);
-		cout << serverAddress.sin_port << endl;
-		
 		if(listen(serverSocket, MAXPENDING)<0){
 			cout << "Error: Server failed to start listen." << endl;
 			exit(1);
 		}
+		
+		//struct hostent *he;
+		//printf("IP address: %s\n", inet_ntoa(*(struct in_addr*)he->serverAddress_addr));
+		
+		// socklen_t serverAddLen;
+		// serverAddLen = sizeof(serverAddress);
+		// if(getsockname(serverSocket,(struct sockaddr*)&serverAddress,&serverAddLen)<0){
+			//error
+		// }else{
+			// printf("Local IP address is: %s\n", inet_ntoa(serverAddress.sin_addr));
+			// printf("Port Number: %d\n", ntohs(serverAddress.sin_port));
+		// }
+		
+		// printf("%d\n",ntohl(serverAddress.sin_addr.s_addr));
+		// char *some_addr;
+		// some_addr = inet_ntoa(serverAddress.sin_addr);
+		// printf("%s\n", some_addr);
+		// printf("Port Number: %d\n", ntohs(serverAddress.sin_port));
 		
 		//not sure why socklen_t works
 		socklen_t clientLength = sizeof(clientAddress);
