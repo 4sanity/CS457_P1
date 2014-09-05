@@ -59,13 +59,33 @@ int main(int argc, char *argv[]){
    		getsockname(serverSocket,(struct sockaddr*)&serverAddress,&length);
 		cout << "Waiting for a connection on " << SADDRESS << " port " << ntohs(serverAddress.sin_port) << endl;
 		
-		//not sure why socklen_t works
+
 		socklen_t clientLength = sizeof(clientAddress);
 		if((clientSocket=accept(serverSocket,(struct sockaddr*)&clientAddress,&clientLength))<0){
 			cout << "Error: Server failed to accept connection." << endl;
 			exit(1);
 		}
-		//getsockname on client here
+		
+		//start send and recv
+		cout << "Found a friend! You receive first." << endl;
+		while(1){
+			cout << "Friend: ";
+			string message;
+			char messageC[139];
+			recv(clientSocket,messageC,140,0);
+			for(unsigned i=0 ; i<strlen(messageC); i++){
+      				cout << messageC[i];
+			}
+			cout << endl;
+			cout << "You: ";
+			cin >> message;
+			if(message.length()>140){
+				cout << "Error: Input too long." << endl;
+			}else{
+				send(clientSocket,message.c_str(),message.size(),0);
+			}
+		}
+		
 		
 		
 	}else if(argc==2){
@@ -150,13 +170,24 @@ int main(int argc, char *argv[]){
 		}
 		cout << "Connecting to server... Connected!" << endl;
 		cout << "Connected to a friend! You send first." << endl;
-		cout << "You: ";
 		
-		string message;
-		cin >> message;
-		if(message.length()>140){
-			cout << "Error: Input too long." << endl;
-			//ask for input?
+		while(1){
+			cout << "You: ";
+			string message;
+			cin >> message;
+			if(message.length()>140){
+				cout << "Error: Input too long." << endl;
+			}else{
+				send(clientSocket,message.c_str(),message.size(),0);
+			}
+			cout << "Friend: ";
+			char messageC[139];
+			recv(clientSocket,messageC,140,0);
+			printf("%s",messageC);
+			//for(unsigned i=0 ; i<strlen(messageC); i++){
+      				//cout << messageC[i] ;
+			//}
+			cout << endl;
 		}
 		
 	}else{
