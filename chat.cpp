@@ -5,11 +5,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string>
+#include <string.h>
 #include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <unistd.h>
+#include <netdb.h>
 
 #define MAXPENDING 5
 
@@ -18,9 +20,9 @@ using namespace std;
 int main(int argc, char *argv[]){
 	
 	int serverSocket;
+	int clientSocket;
 	struct sockaddr_in serverAddress;
 	struct sockaddr_in clientAddress;
-	int newSocket;
 	
 	if(argc==1){
 		//server side
@@ -31,7 +33,7 @@ int main(int argc, char *argv[]){
 		
 		serverAddress.sin_family = AF_INET;
 		serverAddress.sin_addr.s_addr = htonl(INADDR_ANY); //LOOPBACK binds to localhost
-		serverAddress.sin_port = htons(5894);
+		serverAddress.sin_port = htons(0);
 		
 		if(bind(serverSocket,(struct sockaddr*)&serverAddress,sizeof(serverAddress))<0){
 			cout << "Error: Server failed to bind." << endl;
@@ -43,19 +45,25 @@ int main(int argc, char *argv[]){
 			exit(1);
 		}
 		
-		// printf("%d\n",ntohl(serverAddress.sin_addr.s_addr));
-		// char *some_addr;
-		// some_addr = inet_ntoa(serverAddress.sin_addr);
-		// printf("%s\n", some_addr);
-		// printf("Port Number: %d\n", ntohs(serverAddress.sin_port));
+		//gethostname then store IP and port server is on then print
+		string SADDRESS;
+		char buff[80];
+   		gethostname(buff, sizeof(buff));
+    		struct hostent *IP = gethostbyname(buff);
+    		for (int i = 0; IP->h_addr_list[i] != 0; ++i) {
+      			struct in_addr addr;
+      			memcpy(&addr, IP->h_addr_list[i], sizeof(struct in_addr));
+			SADDRESS = inet_ntoa(addr);
+    		}
+		cout << "Waiting for a connection on " << SADDRESS << " port " << htons(serverAddress.sin_port) << endl;
 		
 		//not sure why socklen_t works
 		socklen_t clientLength = sizeof(clientAddress);
-		if((newSocket=accept(serverSocket,(struct sockaddr*)&clientAddress,&clientLength))<0){
+		if((clientSocket=accept(serverSocket,(struct sockaddr*)&clientAddress,&clientLength))<0){
 			cout << "Error: Server failed to accept connection." << endl;
 			exit(1);
 		}
-		
+		//getsockname on client here
 		
 		
 	}else if(argc==2){
