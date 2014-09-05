@@ -55,7 +55,9 @@ int main(int argc, char *argv[]){
       			memcpy(&addr, IP->h_addr_list[i], sizeof(struct in_addr));
 			SADDRESS = inet_ntoa(addr);
     		}
-		cout << "Waiting for a connection on " << SADDRESS << " port " << htons(serverAddress.sin_port) << endl;
+		socklen_t length = sizeof(serverAddress);
+   		getsockname(serverSocket,(struct sockaddr*)&serverAddress,&length);
+		cout << "Waiting for a connection on " << SADDRESS << " port " << ntohs(serverAddress.sin_port) << endl;
 		
 		//not sure why socklen_t works
 		socklen_t clientLength = sizeof(clientAddress);
