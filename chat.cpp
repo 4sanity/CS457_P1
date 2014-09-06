@@ -69,20 +69,21 @@ int main(int argc, char *argv[]){
 		//start send and recv
 		cout << "Found a friend! You receive first." << endl;
 		while(1){
-			cout << "Friend: ";
-			string message;
-			char messageC[139];
-			recv(clientSocket,messageC,140,0);
-			for(unsigned i=0 ; i<strlen(messageC); i++){
-      				cout << messageC[i];
-			}
-			cout << endl;
+		
+			char message[140];
+			recv(clientSocket,message,140,0);
+			printf("Friend: %s\n",message);
+			
+			//loop ask for output
+			
 			cout << "You: ";
-			cin >> message;
-			if(message.length()>140){
+			string output;
+			cin >> output;
+			if(output.length()>140){
 				cout << "Error: Input too long." << endl;
 			}else{
-				send(clientSocket,message.c_str(),message.size(),0);
+				sprintf(message,output.c_str());
+				send(clientSocket,message,140,0);
 			}
 		}
 		
@@ -173,21 +174,21 @@ int main(int argc, char *argv[]){
 		
 		while(1){
 			cout << "You: ";
-			string message;
-			cin >> message;
-			if(message.length()>140){
-				cout << "Error: Input too long." << endl;
-			}else{
-				send(clientSocket,message.c_str(),message.size(),0);
+			string output="";
+			while( (output=="") || (output.length()>140) ){
+				if(output.length()>140){
+					cout << "Error: Input too long." << endl;
+				}
+				cin >> output;
 			}
-			cout << "Friend: ";
-			char messageC[139];
-			recv(clientSocket,messageC,140,0);
-			printf("%s",messageC);
-			//for(unsigned i=0 ; i<strlen(messageC); i++){
-      				//cout << messageC[i] ;
-			//}
-			cout << endl;
+			
+			char message[300];
+			sprintf(message,output.c_str());
+			send(clientSocket,message,140,0);
+			
+			recv(clientSocket,message,140,0);
+			printf("Friend: %s\n",message);
+
 		}
 		
 	}else{
