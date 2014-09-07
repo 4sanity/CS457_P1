@@ -25,8 +25,8 @@ int main(int argc, char *argv[]){
 	struct sockaddr_in clientAddress;
 	
 	struct Packet{
-		short version;
-		short length;
+		u_int16_t version;
+		u_int16_t length;
 		char message[140];
 	};
 	
@@ -199,10 +199,10 @@ int main(int argc, char *argv[]){
 			//sprintf(message,output.c_str());
 			//send(clientSocket,message,140,0);
 			Packet packet;
-			packet.version=457;
-			packet.length=output.length();
+			packet.version=htons(457);
+			packet.length=htons(output.length());
 			strcpy(packet.message,output.c_str());
-			send(clientSocket,(void*)&packet,140,0);
+			send(clientSocket,(void *)&packet,sizeof(Packet),0);
 			
 			recv(clientSocket,(void*)&packet,140,0);
 			printf("Friend: %s\n",packet.message);
