@@ -24,6 +24,12 @@ int main(int argc, char *argv[]){
 	struct sockaddr_in serverAddress;
 	struct sockaddr_in clientAddress;
 	
+	struct Packet{
+		short version;
+		short length;
+		char message[140];
+	};
+	
 	if(argc==1){
 		//server side
 		if((serverSocket=socket(PF_INET,SOCK_STREAM,0))<0){
@@ -74,17 +80,21 @@ int main(int argc, char *argv[]){
 			recv(clientSocket,message,140,0);
 			printf("Friend: %s\n",message);
 			
-			//loop ask for output
-			
-			cout << "You: ";
 			string output;
-			cin >> output;
-			if(output.length()>140){
-				cout << "Error: Input too long." << endl;
-			}else{
-				sprintf(message,output.c_str());
-				send(clientSocket,message,140,0);
+			while( (output=="") || (output.length()>140) ){
+				if(output.length()>140){
+					cout << "Error: Input too long." << endl;
+					cout << "You: ";
+				}
+				if(output==""){
+					cout << "You: ";
+				}
+				getline(cin,output);
 			}
+			sprintf(message,output.c_str());
+			send(clientSocket,message,140,0);
+			
+			
 		}
 		
 		
@@ -173,21 +183,29 @@ int main(int argc, char *argv[]){
 		cout << "Connected to a friend! You send first." << endl;
 		
 		while(1){
-			cout << "You: ";
 			string output="";
 			while( (output=="") || (output.length()>140) ){
 				if(output.length()>140){
 					cout << "Error: Input too long." << endl;
+					cout << "You: ";
 				}
-				cin >> output;
+				if(output==""){
+					cout << "You: ";
+				}
+				getline(cin,output);
 			}
 			
-			char message[300];
-			sprintf(message,output.c_str());
-			send(clientSocket,message,140,0);
+			//char message[140];
+			//sprintf(message,output.c_str());
+			//send(clientSocket,message,140,0);
+			Packet packet;
+			packet.version=457;
+			packet.length=output.length();
+			strcpy(packet.message,output.c_str());
+			send(clientSocket,(void*)&packet,140,0);
 			
-			recv(clientSocket,message,140,0);
-			printf("Friend: %s\n",message);
+			recv(clientSocket,(void*)&packet,140,0);
+			printf("Friend: %s\n",packet.message);
 
 		}
 		
