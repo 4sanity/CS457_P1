@@ -3,9 +3,19 @@ Project 1 - Simple Chat Program
 Date: 9/3/2014
 
 Usage:
+	make
+		-Will compile the chat.cpp into a "chat" executable file.
+
 	./chat
-		-
+		-This will run the server side of the chat program and will wait for incoming connections.
+		 It will display a message when it is connected then wait for a client to send a message.
+		 Once the server receives the message the user will be prompted to respond.
+		 The server can be terminated by using ^c.
 		
 	./chat -h
-		-
+		-This will display a simple help message with the format in which you can provide command line arguments.
 		
+	./chat -p port -s -ip_server
+		-When chat is given the port number and IP address of a server waiting to connect it will attempt to establish a connection.
+		 As the client the user will be promted to send a message first, then the server will send a message back and the client can respond.
+		 The connection can be terminated by using ^c.

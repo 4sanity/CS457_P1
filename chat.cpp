@@ -76,23 +76,23 @@ int main(int argc, char *argv[]){
 		cout << "Found a friend! You receive first." << endl;
 		while(1){
 		
-			char message[140];
-			recv(clientSocket,message,140,0);
-			printf("Friend: %s\n",message);
+			Packet packet;
+			recv(clientSocket,(void*)&packet,sizeof(Packet),0);
+			printf("Friend: %s\n",packet.message);
 			
-			string output;
-			while( (output=="") || (output.length()>140) ){
-				if(output.length()>140){
-					cout << "Error: Input too long." << endl;
-					cout << "You: ";
-				}
-				if(output==""){
-					cout << "You: ";
-				}
+			string output="";
+			cout << "You: ";
+			getline(cin,output);
+			while( output.length()>140 ){
+				cout << "Error: Input too long." << endl;
+				cout << "You: ";
 				getline(cin,output);
 			}
-			sprintf(message,output.c_str());
-			send(clientSocket,message,140,0);
+
+			packet.version=htons(457);
+			packet.length=htons(output.length());
+			strcpy(packet.message,output.c_str());
+			send(clientSocket,(void*)&packet,sizeof(Packet),0);
 			
 			
 		}
@@ -103,7 +103,10 @@ int main(int argc, char *argv[]){
 		string arg1 = argv[1];
 		if(arg1=="-h"){
 			//help message
-			cout << "got to help" << endl;
+			cout << "Usage:" << endl;
+			cout << "Server: ./chat" << endl;
+			cout << "Client: chat -s server_ip -p port" << endl;
+
 		}else{
 			cout << "Error: Argument invalid. Use ./chat -h for help message." << endl;
 		}
@@ -184,27 +187,21 @@ int main(int argc, char *argv[]){
 		
 		while(1){
 			string output="";
-			while( (output=="") || (output.length()>140) ){
-				if(output.length()>140){
-					cout << "Error: Input too long." << endl;
-					cout << "You: ";
-				}
-				if(output==""){
-					cout << "You: ";
-				}
+			cout << "You: ";
+			getline(cin,output);
+			while( output.length()>140 ){
+				cout << "Error: Input too long." << endl;
+				cout << "You: ";
 				getline(cin,output);
 			}
 			
-			//char message[140];
-			//sprintf(message,output.c_str());
-			//send(clientSocket,message,140,0);
 			Packet packet;
 			packet.version=htons(457);
 			packet.length=htons(output.length());
 			strcpy(packet.message,output.c_str());
-			send(clientSocket,(void *)&packet,sizeof(Packet),0);
+			send(clientSocket,(void*)&packet,sizeof(Packet),0);
 			
-			recv(clientSocket,(void*)&packet,140,0);
+			recv(clientSocket,(void*)&packet,sizeof(Packet),0);
 			printf("Friend: %s\n",packet.message);
 
 		}
